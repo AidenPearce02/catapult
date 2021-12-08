@@ -1,0 +1,21 @@
+{
+  "name": "catapult",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "webpack-dev-server --mode development",
+    "build": "webpack --config webpack.config.js",
+    "format": "prettier --write '**/*.js'"
+  },
+  "devDependencies": {
+    "copy-webpack-plugin": "^10.0.0",
+    "html-webpack-plugin": "^5.5.0",
+    "webpack": "^5.64.4",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.6.0",
+    "worker-loader": "^3.0.8"
+  },
+  "dependencies": {
+    "cannon-es": "^0.18.0",
+    "three": "^0.135.0"
+  }
+}
