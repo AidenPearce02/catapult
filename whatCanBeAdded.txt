@@ -1,0 +1,55 @@
+// wheel
+// var wheelGeometry = new THREE.CylinderGeometry(1, 1, 0.5, 8);
+// wheelGeometry.rotateX(Math.PI/2);
+// wheelMaterial = new THREE.MeshStandardMaterial({color: 0x4E3524});
+// wheelMesh = new THREE.Mesh(wheelGeometry, wheelMaterial);
+// scene.add(wheelMesh);
+ // for(let i=0; i<1; i++){
+        //   var wheelGeometry = new THREE.CylinderGeometry(1.5, 1.5, 0.5, 8);
+        //   wheelGeometry.rotateX(Math.PI/2);
+        //   wheelMaterial = new THREE.MeshStandardMaterial({color: 0x4E3524});
+        //   wheelMesh = new THREE.Mesh(wheelGeometry, wheelMaterial);
+        //   //wheelMesh.position.x = wheelsMeshT[i].position.x;
+        //   // wheelMesh.position.y = wheelsMeshT[i].position.y;
+        //   //wheelMesh.position.z = wheelsMeshT[i].position.z;
+        //   // wheelMesh.rotateX(THREE.Math.PI/2);
+        //   scene.add(wheelMesh);
+        //   //catapult.add(wheelMesh);
+        //   // wheelsMeshT[i].removeFromParent();
+        //   // const wheelShape = new CANNON.Cylinder(1.4,1.4,0.5,8);
+        //   // const wheelBody  = new CANNON.Body({
+        //   //   mass: 0,
+        //   // });
+        //   // var axis = new CANNON.Vec3(0,1,0);
+        //   // var angle = -Math.PI / 2;
+        //   // wheelBody.quaternion.setFromAxisAngle(axis, angle);
+        //   // wheelBody.addShape(wheelShape);
+        //   // wheelBody.position.y = 20;
+        //   // world.addBody(wheelBody);
+        //   wheels.push({wheelMesh,wheelBody});
+        // }
+        //console.log(wheels)
+// wheel physics
+  // const wheelShape = new CANNON.Cylinder(1.2,1.2,1,8);
+  // wheelBody  = new CANNON.Body({
+  //   mass: 1,
+  // });
+  // var axis = new CANNON.Vec3(0,1,0);
+  // var angle = -Math.PI / 2;
+  // wheelBody.quaternion.setFromAxisAngle(axis, angle);
+  // wheelBody.addShape(wheelShape);
+  // wheelBody.position.y = 1;
+  // world.addBody(wheelBody);
+
+  // const wheel_ground = new CANNON.ContactMaterial(wheelMaterial, planeMaterial, {
+  //   friction: 0.3,
+  //   restitution: 0,
+  //   contactEquationStiffness: 1000,
+  // })
+  // world.addContactMaterial(wheel_ground)
+// for(let i = 0; i< wheels.length; i++){
+  //   if(wheels[i] !== undefined){
+  //     wheels[i].wheelMesh.position.copy(wheels[i].wheelBody.position)
+  //     wheels[i].wheelMesh.quaternion.copy(wheels[i].wheelBody.quaternion)
+  //   }
+  // }

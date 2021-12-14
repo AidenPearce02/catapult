@@ -3,3 +3,40 @@ canvas{
   top: 0;
   left: 0;
 }
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+}
+
+#massSlider {
+}
+
+#forceSlider {
+}
+
+.text {
+  width: 3rem;
+  margin-right: 1rem;
+  margin-left: 1rem;
+}
+
+.col {
+  flex: 1;
+}
+
+.row {
+  display: flex;
+  margin-bottom: 1rem;
+}
+
+#sliderContainer{
+  position: fixed;
+  right: 1rem;
+  top: 1rem;
+}
+

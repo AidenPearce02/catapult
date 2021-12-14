@@ -7,20 +7,42 @@ module.exports = {
   entry: './src/main.js',
   plugins: [
     new HtmlWebpackPlugin({
-      title: 'Catapult'
+      title: 'Catapult',
+      template: './index.html'
     }),
     new CopyWebpackPlugin({
       patterns: [
         {from: 'static'}
       ]
-    })
+    }),
   ],
   output: {
-    filename: 'bundle.js',
+    filename: 'bundle.[hash].js',
     path: path.resolve(__dirname, 'public'),
     clean: true
   },
-
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        loader: "babel-loader",
+        exclude: "/node_modules/",
+      },
+      {
+        test: /\.css$/,
+        use: [
+          "style-loader",
+          {
+            loader: "css-loader",
+            options: {
+              importLoaders: 1,
+              modules: true,
+            },
+          },
+        ],
+      },
+    ],
+  },
   devServer: {
     static: {
       directory: path.join(__dirname, 'public'),
