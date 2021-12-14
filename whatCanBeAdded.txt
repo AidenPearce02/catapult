@@ -53,3 +53,15 @@
   //     wheels[i].wheelMesh.quaternion.copy(wheels[i].wheelBody.quaternion)
   //   }
   // }
+  // wheelBody.applyTorque(new CANNON.Vec3(0,0,20));
+      // for(let i = 0; i< wheels.length; i++){
+      //   if(wheels[i] !== undefined){
+      //     console.log("hello")
+      //     // wheels[i].wheelBody.applyTorque(new CANNON.Vec3(0,0,20));
+      //   }
+      // }
+      //wheelBody.applyTorque(new CANNON.Vec3(0,0,20));
+      //wheelBody.applyTorque(new CANNON.Vec3(0,0,-20));
+      
+  // controls = new OrbitControls(camera, renderer.domElement);
+  // controls.enableKeys = false;

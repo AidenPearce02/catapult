@@ -5,8 +5,8 @@ import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
 
 let scene, camera, renderer, world, clock = new THREE.Clock(), timeStep = 1 / 144, catapult, cup, goal;
-let mass = 1, force = 20, delta, lastCallTime, isFlying = false, temp = new THREE.Vector3;
-let ammoMesh, ammoBody;
+let mass = 1, force = 20, delta, lastCallTime, isFlying = false, temp = new THREE.Vector3, counter = 0;
+let ammoMesh, ammoBody, pig, pigBody;
 let wheels = [], meshesWithBody = [];
 
 const sizes = {
@@ -36,6 +36,7 @@ function initThree(){
     antialias: true
   })
   renderer.setSize(sizes.width, sizes.height);
+
   // Shadow
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -54,8 +55,6 @@ function initThree(){
   scene.add( light );
 
   addObjectsThree();
-  // controls = new OrbitControls(camera, renderer.domElement);
-  // controls.enableKeys = false;
 }
 
 window.addEventListener('resize', () =>
@@ -178,19 +177,32 @@ function fire(){
   if(ammoBody != undefined)
     world.removeBody(ammoBody);
   // ammo mesh
-  var ammoGeometry = new THREE.SphereGeometry(1, 32, 16);
-  var ammoMaterial = new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide});
-  ammoMesh = new THREE.Mesh( ammoGeometry, ammoMaterial);
-  cup.getWorldPosition(ammoMesh.position); 
-  scene.add(ammoMesh);
+  let position = new THREE.Vector3;
+  cup.getWorldPosition(position);
+  ammoMesh = addObjectThree(
+    new THREE.SphereGeometry(1, 32, 16),
+    new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide}),
+    {
+      position: position,
+      receiveShadow: true
+    }
+  )
 
   // ammo body
+  const ammoMaterial = new CANNON.Material("ammo");
   const sphereShape = new CANNON.Sphere( 0.5 )
-  ammoBody = new CANNON.Body({ mass: mass, shape: sphereShape })
+  ammoBody = new CANNON.Body({ mass: mass, shape: sphereShape, material: ammoMaterial })
   ammoBody.position.copy(ammoMesh.position);
   world.addBody(ammoBody);
   ammoBody.addEventListener("collide", (e) => {
-    isFlying = false;
+    setTimeout(function() {
+      isFlying = false;
+      if(ammoMesh != undefined)
+        scene.remove(ammoMesh)
+      if(ammoBody != undefined)
+        world.removeBody(ammoBody);
+    }, 0);
+
   });
 }
 
@@ -235,7 +247,7 @@ function onKeyDown(e){// seconds.
       var cannonVector = new CANNON.Vec3(forceVector.x, forceVector.y, forceVector.z);
       ammoBody.applyImpulse(
         cannonVector,
-        ammoBody.position
+        new CANNON.Vec3().copy(ammoBody.position)
         )
       isFlying = true;
     }
@@ -255,7 +267,7 @@ function worldStep(){
 
 function render(){
   requestAnimationFrame( render );
-  worldStep();
+  
   
   delta = clock.getDelta(); 
 
@@ -271,6 +283,10 @@ function render(){
     }
   })
 
+  if(pig != undefined && pig != null && pigBody != undefined && pigBody != null){
+    pig.position.copy(pigBody.position);
+    pig.quaternion.copy(pigBody.quaternion);
+  }
   if(!isFlying)
   {
     if(goal != undefined){
@@ -287,15 +303,16 @@ function render(){
     ammoMesh.getWorldPosition(objectPosition);
     camera.position.copy(objectPosition).add(cameraOffset);
   }
+  worldStep();
   renderer.render(scene, camera)
   
   
 }
 
 function addObjectsCannon(){
-  var planeMaterial = new CANNON.Material("ground");
-  var planeShape = new CANNON.Box(new CANNON.Vec3(256, 256, 1));
-  var planeBody = new CANNON.Body({mass: 0, shape: planeShape, material: planeMaterial});
+  let planeMaterial = new CANNON.Material("ground");
+  let planeShape = new CANNON.Box(new CANNON.Vec3(256, 256, 1));
+  let planeBody = new CANNON.Body({mass: 0, shape: planeShape, material: planeMaterial});
   planeBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
   world.addBody(planeBody);
 
@@ -308,7 +325,8 @@ function addObjectsCannon(){
     world.addBody(cubeBody);
     object.body = cubeBody;
   })
-  var physicsContactMaterial = new CANNON.ContactMaterial(
+
+  let physicsContactMaterial = new CANNON.ContactMaterial(
     planeMaterial,      // Material #1
     cubeMaterial,      // Material #2
     {
@@ -317,6 +335,17 @@ function addObjectsCannon(){
     }
   );   
   world.addContactMaterial(physicsContactMaterial); 
+
+  let pigMaterial = new CANNON.Material("pig");
+  let pigShape = new CANNON.Sphere(4 );
+  pigBody = new CANNON.Body({mass:4, shape: pigShape, material:pigMaterial});
+  pigBody.position.copy(pig.position);
+  world.addBody(pigBody);
+  pigBody.addEventListener("collide", (e) => {
+    let name = e.body.material.name
+    if(name.includes("wood") || name.includes("ammo"))
+      console.log("U win")
+  })
 }
 
 function addObjectThree(geometry, material, options){
@@ -339,7 +368,7 @@ function addObjectsThree(){
     new THREE.SphereGeometry( 256, 256, 256 ),
     new THREE.MeshBasicMaterial( {map: new THREE.TextureLoader().load('textures/sky.jpg'), transparent: true, side: THREE.DoubleSide} ),
     {
-      position: new THREE.Vector3(0,0,0)
+      position: new THREE.Vector3(0, 0, 0)
     }
   )
 
@@ -384,6 +413,16 @@ function addObjectsThree(){
       hasBody: true
     }
   )
+
+  // pig
+  pig = addObjectThree(
+    new THREE.SphereGeometry(5, 32, 16),
+    new THREE.MeshStandardMaterial( {color: 0xFFB6C1, side: THREE.DoubleSide} ),
+    {
+      position: new THREE.Vector3(0, 5, -50),
+      receiveShadow: true
+    }
+  )
   
   //catapult
   const mtlLoader = new MTLLoader();
@@ -420,6 +459,33 @@ function addObjectsThree(){
       goal.position.set(0, 18, 30);    
     });
   });
+  // mtlLoader.load('models/pig/pig.mtl', (mtl) => {
+  //   mtl.preload();
+  //   const objLoader = new OBJLoader();
+  //   objLoader.setMaterials(mtl);
+  //   objLoader.load('models/pig/pig.obj', (obj) => {
+  //     pig = obj;
+  //     obj.traverse(function (child) {
+  //       if(child instanceof THREE.Mesh){
+  //         var center = new THREE.Vector3();
+  //         child.geometry.computeBoundingBox();
+  //         child.geometry.boundingBox.getCenter(center);
+  //         console.log(child.geometry.boundingSphere)
+  //         child.geometry.center();
+  //         child.position.copy(center);
+  //       }
+  //     });
+  //     pig.scale.set(0.25, 0.25, 0.25);
+  //     pig.position.set(0, 50, -50);
+  //     scene.add(pig);
+  //     console.log(pig);
+  //     let pigMaterial = new CANNON.Material("pig");
+  //     let pigShape = new CANNON.Box(new CANNON.Vec3(2,2,2))
+  //     pigBody = new CANNON.Body({mass:5, shape: pigShape, material:pigMaterial});
+  //     pigBody.position.copy(pig.position);
+  //     world.addBody(pigBody);
+  //   });
+  // });
 }
 
 
