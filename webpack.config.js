@@ -2,24 +2,46 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin'); 
 
+const pages = ["help", "credits", "index", "demo", "wood", "brick", "straw"];
+
 module.exports = {
   mode: 'production',
-  entry: './src/main.js',
-  plugins: [
-    new HtmlWebpackPlugin({
-      title: 'Catapult',
-      template: './index.html'
-    }),
+  entry: pages.reduce((config, page) => {
+    config[page] = `./src/${page}.js`;
+    return config;
+  }, {}),
+  plugins:  [].concat(
+    pages.map(
+      (page) =>
+        new HtmlWebpackPlugin({
+          inject: true,
+          template: `./${page}.html`,
+          filename: `${page}.html`,
+          chunks: [page],
+        })
+    ),
     new CopyWebpackPlugin({
-      patterns: [
-        {from: 'static'}
-      ]
-    }),
-  ],
+          patterns: [
+            {from: 'static'}
+          ]
+        }),
+  ),
+  //  [
+  //   new HtmlWebpackPlugin({
+  //     title: 'Catapult',
+  //     template: './index.html'
+  //   }),
+  //   
+  // ],
   output: {
-    filename: 'bundle.[hash].js',
-    path: path.resolve(__dirname, 'public'),
+    filename: "[name].js",
+    path: path.resolve(__dirname, "dist"),
     clean: true
+  },
+  optimization: {
+    splitChunks: {
+      chunks: "all",
+    },
   },
   module: {
     rules: [
@@ -38,6 +60,14 @@ module.exports = {
               importLoaders: 1,
               modules: true,
             },
+          },
+        ],
+      },
+      {
+        test: /\.(png|jpe?g|gif)$/i,
+        use: [
+          {
+            loader: 'file-loader',
           },
         ],
       },
